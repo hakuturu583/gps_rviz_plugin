@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find gps_rviz_plugin)/config/gps_rviz_plugin.rviz" output="screen" respawn="true">
+  </node>
+
+  <node name="nmea_topic_driver" pkg="gps_rviz_plugin" type="nmea_topic_driver.py" args="" output="screen" respawn="true">
+  </node>
+
+  <node name="rosbag" pkg="rosbag" type="play" args="$(find gps_rviz_plugin)/data/2017-10-28-16-02-02.bag" output="screen" respawn="true">
+  </node>
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_tf_broadcaster" args="0 0 0 0 0 0 map gps" />
+</launch>
