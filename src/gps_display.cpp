@@ -29,6 +29,8 @@ namespace gps_rviz_plugin
     alpha_property_->setMin(0);
     position_x_property_ = new rviz::IntProperty("Position X", 0, "map image position x", this, SLOT(updateDisplayProperty()));
     position_y_property_ = new rviz::IntProperty("Position Y", 0, "map image position y", this, SLOT(updateDisplayProperty()));
+    messages_per_plot_property_ = new rviz::IntProperty("Message per plot", 5, "message per plot", this, SLOT(updateDisplayProperty()));
+    messages_per_plot_property_->setMin(1);
   }
 
   gps_display::~gps_display()
@@ -65,7 +67,7 @@ namespace gps_rviz_plugin
 
   void gps_display::processMessage(const sensor_msgs::NavSatFix::ConstPtr& msg)
   {
-    if(msg->header.seq%5==0)
+    if(msg->header.seq%messages_per_plot_property_->getInt()==0)
     {
       try
       {
