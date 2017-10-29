@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(gps_rviz_plugin)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -17,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(PythonLibs)
+
+find_package(OpenCV REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -123,6 +125,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIR}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 link_directories(${catkin_LIBRARY_DIRS})
@@ -155,10 +158,12 @@ add_definitions(-DQT_NO_KEYWORDS)
 
 add_library(gps_rviz_plugin
   src/gps_display.cpp
+  src/overlay_utils.cpp
   include/gps_display.h
+  include/overlay_utils.h
 )
 
-target_link_libraries(gps_rviz_plugin ${QT_LIBRARIES} ${catkin_LIBRARIES} ${PYTHON_LIBRARY})
+target_link_libraries(gps_rviz_plugin ${QT_LIBRARIES} ${catkin_LIBRARIES} ${PYTHON_LIBRARY} ${OpenCV_LIBRARIES})
 
 install(FILES plugin_description.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
