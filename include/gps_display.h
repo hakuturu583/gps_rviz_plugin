@@ -62,6 +62,8 @@ namespace gps_rviz_plugin
       rviz::IntProperty* width_property_;
       rviz::IntProperty* height_property_;
       rviz::IntProperty* scale_property_;
+      rviz::IntProperty* position_x_property_;
+      rviz::IntProperty* position_y_property_;
       rviz::FloatProperty* alpha_property_;
       rviz::StringProperty* api_key_property_;
       rviz::EnumProperty* maptype_property_;

@@ -9,10 +9,10 @@ namespace gps_rviz_plugin
     zoom_property_ = new rviz::IntProperty("Zoom Property", 19, "zoom of map", this, SLOT(updateGooleMapAPIProperty()));
     zoom_property_->setMax(22);
     zoom_property_->setMin(0);
-    width_property_  = new rviz::IntProperty("Width", 640, "request map image width", this, SLOT(updateGooleMapAPIProperty()));
+    width_property_  = new rviz::IntProperty("Width", 320, "request map image width", this, SLOT(updateGooleMapAPIProperty()));
     width_property_->setMax(640);
     width_property_->setMin(0);
-    height_property_ = new rviz::IntProperty("Height", 640, "request map image height", this, SLOT(updateGooleMapAPIProperty()));
+    height_property_ = new rviz::IntProperty("Height", 320, "request map image height", this, SLOT(updateGooleMapAPIProperty()));
     height_property_->setMax(640);
     height_property_->setMin(0);
     scale_property_ = new rviz::IntProperty("Scale", 1, "request map image scale", this, SLOT(updateGooleMapAPIProperty()));
@@ -27,6 +27,8 @@ namespace gps_rviz_plugin
     alpha_property_ = new rviz::FloatProperty("Alpha", 0.8 , "image alpha", this, SLOT(updateDisplayProperty()));
     alpha_property_->setMax(1);
     alpha_property_->setMin(0);
+    position_x_property_ = new rviz::IntProperty("Position X", 0, "map image position x", this, SLOT(updateDisplayProperty()));
+    position_y_property_ = new rviz::IntProperty("Position Y", 0, "map image position y", this, SLOT(updateDisplayProperty()));
   }
 
   gps_display::~gps_display()
@@ -63,43 +65,46 @@ namespace gps_rviz_plugin
 
   void gps_display::processMessage(const sensor_msgs::NavSatFix::ConstPtr& msg)
   {
-    try
+    if(msg->header.seq%5==0)
     {
-      std::string request_url;
-      build_request_url(msg, request_url);
-      //download_map(request_url);
-      cv::Mat map_image = cv::imread(map_image_path_);
-      if(!overlay_)
+      try
       {
-        static int count = 0;
-        rviz::UniformStringStream ss;
-        ss << "OverlayImageDisplayObject" << count++;
-        overlay_.reset(new OverlayObject(ss.str()));
-        overlay_->show();
-      }
-      if (overlay_)
-      {
-        overlay_->setDimensions(width_property_->getInt(), height_property_->getInt());
-        overlay_->setPosition(0,0);
-      }
-      overlay_->updateTextureSize(width_property_->getInt(),height_property_->getInt());
-      ScopedPixelBuffer buffer = overlay_->getBuffer();
-      QImage Hud = buffer.getQImage(*overlay_);
-      for (int i = 0; i < overlay_->getTextureWidth(); i++)
-      {
-        for (int j = 0; j < overlay_->getTextureHeight(); j++)
+        std::string request_url;
+        build_request_url(msg, request_url);
+        download_map(request_url);
+        cv::Mat map_image = cv::imread(map_image_path_);
+        if(!overlay_)
         {
-          QColor color(map_image.data[j * map_image.step + i * map_image.elemSize() + 2],
-                       map_image.data[j * map_image.step + i * map_image.elemSize() + 1],
-                       map_image.data[j * map_image.step + i * map_image.elemSize() + 0],
-                       alpha_property_->getFloat() * 255.0);
-          Hud.setPixel(i, j, color.rgba());
+          static int count = 0;
+          rviz::UniformStringStream ss;
+          ss << "OverlayImageDisplayObject" << count++;
+          overlay_.reset(new OverlayObject(ss.str()));
+          overlay_->show();
+        }
+        if (overlay_)
+        {
+          overlay_->setDimensions(width_property_->getInt(), height_property_->getInt());
+          overlay_->setPosition(position_x_property_->getInt(),position_y_property_->getInt());
+        }
+        overlay_->updateTextureSize(width_property_->getInt(),height_property_->getInt());
+        ScopedPixelBuffer buffer = overlay_->getBuffer();
+        QImage Hud = buffer.getQImage(*overlay_);
+        for (int i = 0; i < overlay_->getTextureWidth(); i++)
+        {
+          for (int j = 0; j < overlay_->getTextureHeight(); j++)
+          {
+            QColor color(map_image.data[j * map_image.step + i * map_image.elemSize() + 2],
+                         map_image.data[j * map_image.step + i * map_image.elemSize() + 1],
+                         map_image.data[j * map_image.step + i * map_image.elemSize() + 0],
+                         alpha_property_->getFloat() * 255.0);
+            Hud.setPixel(i, j, color.rgba());
+          }
         }
       }
-    }
-    catch(...)
-    {
-      ROS_ERROR_STREAM("failed to request map");
+      catch(...)
+      {
+        ROS_ERROR_STREAM("failed to request map");
+      }
     }
   }
 
