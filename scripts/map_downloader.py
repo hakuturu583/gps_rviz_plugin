@@ -1,14 +1,20 @@
 #! /usr/bin/env python
 import rospkg
 import sys
+import requests
 
 
 def download_map(request_url):
     rospack = rospkg.RosPack()
     map_image_path = rospack.get_path('gps_rviz_plugin') + "/data/map.png"
-    return 0
+    f=open(map_image_path,'wb')
+    try:
+        f.write(requests.get(request_url).content)
+        f.close()
+        return 0
+    except:
+        f.close()
+        return -1
 
 if __name__ == '__main__':
     pass
-    #args = sys.argv
-    #sys.exit(download_map(args[1]))
