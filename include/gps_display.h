@@ -10,6 +10,8 @@
 #define GIF 1
 #define JPEG 2
 
+#define MAX_REQUEST_URL_LENGTH 8192
+
 #include "overlay_utils.h"
 
 //headers for ROS

@@ -150,15 +150,46 @@ namespace gps_rviz_plugin
     this->setStatus(rviz::StatusProperty::Level::Ok, "APIKey", "API key is exist");
     std::string center_request = "center=" + std::to_string(msg->latitude) + "," + std::to_string(msg->longitude);
     request_url = request_url + center_request;
-    std::string markers_request = "&markers=color:red%7Clabel:C%7C" + std::to_string(msg->latitude) + "," + std::to_string(msg->longitude);
+    std::string markers_request = "&markers=color:red%7C" + std::to_string(msg->latitude) + "," + std::to_string(msg->longitude);
     request_url = request_url + markers_request;
     std::string zoom_request = "&zoom=" + std::to_string(zoom_property_->getInt());
     request_url = request_url + zoom_request;
     std::string size_request = "&size=" + std::to_string(width_property_->getInt()) + "x" + std::to_string(height_property_->getInt());
     request_url = request_url + size_request;
+    if(maptype_property_->getOptionInt() == ROADMAP)
+    {
+      std::string maptype_url = "&maptype=roadmap";
+      request_url = request_url + maptype_url;
+    }
+    if(maptype_property_->getOptionInt() == TERRAIN)
+    {
+      std::string maptype_url = "&maptype=terrain";
+      request_url = request_url + maptype_url;
+    }
+    if(maptype_property_->getOptionInt() == SATELLITE)
+    {
+      std::string maptype_url = "&maptype=satellite";
+      request_url = request_url + maptype_url;
+    }
+    if(maptype_property_->getOptionInt() == HYBRID)
+    {
+      std::string maptype_url = "&maptype=hybrid";
+      request_url = request_url + maptype_url;
+    }
 
     std::string key_request = "&key=" + api_key_property_->getStdString();
     request_url = request_url + key_request;
+    if(request_url.size() > MAX_REQUEST_URL_LENGTH)
+    {
+      QString message = QString("%1%2").arg(request_url.size()).arg(" request url is too long");
+      this->setStatus(rviz::StatusProperty::Level::Error, "TooLongRequestUrl", message);
+      return false;
+    }
+    else
+    {
+      QString message = QString("%1%2").arg(request_url.size()).arg("characters");
+      this->setStatus(rviz::StatusProperty::Level::Ok, "TooLongRequestUrl", message);
+    }
     return true;
    }
 }
