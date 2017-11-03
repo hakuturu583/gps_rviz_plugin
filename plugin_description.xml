@@ -1,5 +1,5 @@
 <library path="lib/libgps_rviz_plugin">
-  <class name="gps_rviz_plugin/gps_display" type="gps_rviz_plugin::gps_display" base_class_type="rviz::Display">
+  <class name="gps_rviz_plugin/OverlayGpsDisplay" type="gps_rviz_plugin::OverlayGpsDisplay" base_class_type="rviz::Display">
     <description>
       display sensor_msgs/NavSatFix message
     </description>

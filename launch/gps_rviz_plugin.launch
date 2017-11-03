@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
+  <rosparam command="load" file="$(find gps_rviz_plugin)/config/google_static_map_api_key.yaml"/>
+
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find gps_rviz_plugin)/config/gps_rviz_plugin.rviz" output="screen" respawn="true">
   </node>
 
