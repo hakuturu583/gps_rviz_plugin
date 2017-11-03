@@ -157,9 +157,9 @@ endif()
 add_definitions(-DQT_NO_KEYWORDS)
 
 add_library(gps_rviz_plugin
-  src/gps_display.cpp
+  src/overlay_gps_display.cpp
   src/overlay_utils.cpp
-  include/gps_display.h
+  include/overlay_gps_display.h
   include/overlay_utils.h
 )
 

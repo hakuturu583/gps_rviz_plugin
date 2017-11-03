@@ -25,7 +25,7 @@
 #include <rviz/message_filter_display.h>
 #include <rviz/properties/int_property.h>
 #include <rviz/properties/float_property.h>
-#include <rviz/properties/string_property.h>
+//#include <rviz/properties/string_property.h>
 #include <rviz/properties/enum_property.h>
 #include <rviz/properties/status_property.h>
 #include <rviz/uniform_string_stream.h>
@@ -46,12 +46,12 @@
 
 namespace gps_rviz_plugin
 {
-  class gps_display: public rviz::MessageFilterDisplay<sensor_msgs::NavSatFix>
+  class OverlayGpsDisplay: public rviz::MessageFilterDisplay<sensor_msgs::NavSatFix>
   {
     Q_OBJECT
     public:
-      gps_display();
-      virtual ~gps_display();
+      OverlayGpsDisplay();
+      virtual ~OverlayGpsDisplay();
     protected:
       virtual void onInitialize();
       virtual void reset();
@@ -68,10 +68,10 @@ namespace gps_rviz_plugin
       rviz::IntProperty* position_y_property_;
       rviz::IntProperty* messages_per_plot_property_;
       rviz::FloatProperty* alpha_property_;
-      rviz::StringProperty* api_key_property_;
+      //rviz::StringProperty* api_key_property_;
       rviz::EnumProperty* maptype_property_;
       PyObject* map_downloader_function_;
-      std::string map_image_path_;
+      std::string map_image_path_,api_key_;
       OverlayObject::Ptr overlay_;
     private Q_SLOTS:
       void updateGooleMapAPIProperty();
