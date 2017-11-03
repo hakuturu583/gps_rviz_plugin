@@ -19,6 +19,9 @@ namespace gps_rviz_plugin
     scale_property_ = new rviz::IntProperty("Scale", 1, "request map image scale", this, SLOT(updateGooleMapAPIProperty()));
     scale_property_->setMax(2);
     scale_property_->setMin(1);
+    history_length_property_ = new rviz::IntProperty("History Length", 15, "history length", this, SLOT(updateHistoryLength()));
+    history_length_property_->setMin(1);
+    fix_buffer_ = boost::circular_buffer<sensor_msgs::NavSatFix>(history_length_property_->getInt());
     //api_key_property_ = new rviz::StringProperty("API Key", "", "Google Static Map API Key", this, SLOT(updateGooleMapAPIProperty()));
     maptype_property_ = new rviz::EnumProperty("Map Type", "roadmap", "map type", this, SLOT(updateGooleMapAPIProperty()));
     maptype_property_->addOption("roadmap", ROADMAP);
@@ -70,6 +73,7 @@ namespace gps_rviz_plugin
   {
     if(msg->header.seq%messages_per_plot_property_->getInt()==0)
     {
+      fix_buffer_.push_back(*msg);
       std::string request_url;
       if(build_request_url(msg, request_url) == false)
       {
@@ -122,6 +126,12 @@ namespace gps_rviz_plugin
   void OverlayGpsDisplay::updateDisplayProperty()
   {
 
+  }
+
+  void OverlayGpsDisplay::updateHistoryLength()
+  {
+    fix_buffer_.clear();
+    fix_buffer_ = boost::circular_buffer<sensor_msgs::NavSatFix>(history_length_property_->getInt());
   }
 
   void OverlayGpsDisplay::load_map_downloader_script()
@@ -182,6 +192,12 @@ namespace gps_rviz_plugin
       std::string maptype_url = "&maptype=hybrid";
       request_url = request_url + maptype_url;
     }
+    std::string path_url = "&path=color:blue|weight:5";
+    for(auto fix_data = fix_buffer_.rbegin(); fix_data != fix_buffer_.rend(); ++fix_data)
+    {
+      path_url = path_url + "|" + std::to_string(fix_data->latitude) + "," + std::to_string(fix_data->longitude);
+    }
+    request_url = request_url + path_url;
 
     std::string key_request = "&key=" + api_key_;//api_key_property_->getStdString();
     request_url = request_url + key_request;
