@@ -43,6 +43,8 @@
 
 //headers for stl
 #include <string>
+#include<fstream>
+#include<iostream>
 
 //headers for boost
 #include <boost/circular_buffer.hpp>
@@ -60,9 +62,10 @@ namespace gps_rviz_plugin
       virtual void reset();
     private:
       void processMessage(const sensor_msgs::NavSatFix::ConstPtr& msg);
-      void download_map(std::string request_url);
+      bool download_map(std::string request_url);
       void load_map_downloader_script();
       bool build_request_url(const sensor_msgs::NavSatFix::ConstPtr& msg, std::string& request_url);
+      inline bool check_map_image_file();
       rviz::IntProperty* zoom_property_;
       rviz::IntProperty* width_property_;
       rviz::IntProperty* height_property_;

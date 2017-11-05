@@ -48,15 +48,25 @@ namespace gps_rviz_plugin
     delete maptype_property_;
   }
 
-  void OverlayGpsDisplay::download_map(std::string request_url)
+  bool OverlayGpsDisplay::download_map(std::string request_url)
   {
     PyObject* args = PyTuple_New(1);
     PyObject* kw_args = PyDict_New();
     PyObject* request_url_str = PyString_FromString(request_url.c_str());
     PyTuple_SetItem(args, 0, request_url_str);
-    PyObject* responce = PyObject_Call(map_downloader_function_, args, kw_args);
+    try
+    {
+      PyObject* responce = PyObject_Call(map_downloader_function_, args, kw_args);
+    }
+    catch(...)
+    {
+      Py_DECREF(args);
+      Py_DECREF(kw_args);
+      return false;
+    }
     Py_DECREF(args);
     Py_DECREF(kw_args);
+    return true;
   }
 
   void OverlayGpsDisplay::onInitialize()
@@ -87,7 +97,19 @@ namespace gps_rviz_plugin
       {
         ROS_ERROR_STREAM("failed to request map");
       }
+      if(check_map_image_file() == false)
+      {
+        this->setStatus(rviz::StatusProperty::Level::Error, "MapImageFileNotExist", "map image file does not exist. Check API Key.");
+        return;
+      }
+      this->setStatus(rviz::StatusProperty::Level::Ok, "MapImageFileNotExist", "map image file exist");
       cv::Mat map_image = cv::imread(map_image_path_);
+      if(map_image.cols <= 0 || map_image.rows <= 0)
+      {
+        this->setStatus(rviz::StatusProperty::Level::Error, "MapImageFileIsInvalidSize", "map image file is invalid size. Check API Key.");
+        return;
+      }
+      this->setStatus(rviz::StatusProperty::Level::Ok, "MapImageFileIsInvalidSize", "map image file is valid size");
       if(!overlay_)
       {
         static int count = 0;
@@ -198,6 +220,7 @@ namespace gps_rviz_plugin
       path_url = path_url + "|" + std::to_string(fix_data->latitude) + "," + std::to_string(fix_data->longitude);
     }
     request_url = request_url + path_url;
+    //request_url = request_url + "&format=jpg";
 
     std::string key_request = "&key=" + api_key_;//api_key_property_->getStdString();
     request_url = request_url + key_request;
@@ -212,7 +235,14 @@ namespace gps_rviz_plugin
       QString message = QString("%1%2").arg(request_url.size()).arg("characters");
       this->setStatus(rviz::StatusProperty::Level::Ok, "TooLongRequestUrl", message);
     }
+    //ROS_INFO_STREAM("request url:" << request_url);
     return true;
+   }
+
+   bool OverlayGpsDisplay::check_map_image_file()
+   {
+     std::ifstream ifs(map_image_path_);
+     return ifs.is_open();
    }
 }
 
