@@ -1,7 +1,7 @@
 # gps_rviz_plugin
 rviz plugin for /fix(sensor_msgs/NavSatFix) message visualization  
 
-![visualization](https://github.com/hakuturu583/gps_rviz_plugin/blob/master/images/OverLayGpsDisplay.png)
+![visualization](https://github.com/hakuturu583/gps_rviz_plugin/blob/master/images/OverlayGpsDisplay.png)
 
 ## how to use  
 1. get Google Static Map API key  
