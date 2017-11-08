@@ -7,7 +7,7 @@ namespace gps_rviz_plugin
     ros::param::get("/overlay_gps_display/google_static_map_api_key" ,api_key_);
     map_image_path_ = ros::package::getPath("gps_rviz_plugin") + "/data/map.png";
     load_map_downloader_script();
-    zoom_property_ = new rviz::IntProperty("Zoom Property", 19, "zoom of map", this, SLOT(updateGooleMapAPIProperty()));
+    zoom_property_ = new rviz::IntProperty("Zoom", 19, "zoom of map", this, SLOT(updateGooleMapAPIProperty()));
     zoom_property_->setMax(22);
     zoom_property_->setMin(0);
     width_property_  = new rviz::IntProperty("Width", 320, "request map image width", this, SLOT(updateGooleMapAPIProperty()));
