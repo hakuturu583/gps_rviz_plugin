@@ -5,7 +5,7 @@ namespace gps_rviz_plugin
   OverlayGpsDisplay::OverlayGpsDisplay()
   {
     ros::param::get("/overlay_gps_display/google_static_map_api_key" ,api_key_);
-    map_image_path_ = ros::package::getPath("gps_rviz_plugin") + "/data/map.png";
+    map_image_path_ = ros::package::getPath("gps_rviz_plugin") + "/config/map.png";
     load_map_downloader_script();
     zoom_property_ = new rviz::IntProperty("Zoom", 19, "zoom of map", this, SLOT(updateGooleMapAPIProperty()));
     zoom_property_->setMax(22);
@@ -100,10 +100,13 @@ namespace gps_rviz_plugin
       if(check_map_image_file() == false)
       {
         this->setStatus(rviz::StatusProperty::Level::Error, "MapImageFileNotExist", "map image file does not exist. Check API Key.");
+std::cout << "ERROR: there is no map.png in : "<< map_image_path_ << "\n";
+std::cout << "api_key_ is: "<< api_key_ << "\n";
         return;
       }
       this->setStatus(rviz::StatusProperty::Level::Ok, "MapImageFileNotExist", "map image file exist");
       cv::Mat map_image = cv::imread(map_image_path_);
+     
       if(map_image.cols <= 0 || map_image.rows <= 0)
       {
         this->setStatus(rviz::StatusProperty::Level::Error, "MapImageFileIsInvalidSize", "map image file is invalid size. Check API Key.");
